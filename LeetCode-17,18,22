@@ -1,0 +1,117 @@
+class Solution {
+/*
+17.电话号码的字母组合
+给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。
+给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+*/
+  public List<String> letterCombinations(String digits) {
+    List<String> combinations = new ArrayList<>();
+    if(digits.length() == 0) {
+      return combinations;
+    }
+    Map<Character, String> phoneMap = new HashMap<>() {{
+        put('2', "abc");
+        put('3', "def");
+        put('4', "ghi");
+        put('5', "jkl");
+        put('6', "mno");
+        put('7', "pqrs");
+        put('8', "tuv");
+        put('9', "wxyz");
+    }};
+    backtrack(combinations, phoneMap, digits, 0, new StringBuffer());
+    return combinations;
+  }
+  public void backtrack(List<String> combinations, Map<Character, String> phoneMap, String digits, int index, StringBuffer combination) {
+    if(index == digits.length()) {
+      combinations.add(combination.toString());
+    } else {
+        char digit = digits.charAt(index);
+        String letters = phoneMap.get(digit);
+        int lettersCount = letters.length();
+        for(int i = 0; i < lettersCount; i++) {
+          combination.append(letters.charAt(i));
+          backtrack(combinations, phoneMap, digits, index + 1, combination);
+          combination.deleteCharAt(index);
+        }
+    }
+  }
+/*
+18.四数之和
+给你一个由 n 个整数组成的数组 nums ，和一个目标值 target 。请你找出并返回满足下述全部条件且不重复的四元组 [nums[a], nums[b], nums[c], nums[d]] （若两个四元组元素一一对应，则认为两个四元组重复）：
+0 <= a, b, c, d < n
+a、b、c 和 d 互不相同
+nums[a] + nums[b] + nums[c] + nums[d] == target
+你可以按 任意顺序 返回答案 。
+*/
+  public List<List<Integer>> fourSum(int[] nums, int target) {
+    Arrays.sort(nums);
+    List<List<Integer>> ans = new ArrayList<>();
+    int n = nums.length;
+    for(int i = 0; i < n - 3; i++) {
+      long x = nums[i];
+      if(i > 0 && x == nums[i - 1]) {
+        continue;
+      }
+      if(x + nums[i + 1] + nums[i + 2] + nums[i + 3] > target) {
+        break;
+      }
+      if(x + nums[n - 3] + nums[n - 2] + nums[n - 1] < target) {
+        continue;
+      }
+      for(int j = i + 1; j < n - 2; j++) {
+        long y = nums[j];
+        if(j > i + 1 && y == nums[j - 1]) {
+          continue;
+        }
+        if(x + y + nums[j + 1] + nums[j + 2] > target) {
+          break;
+        }
+        if(x + y + nums[n - 2] + nums[n - 1] < target) {
+          continue;
+        }
+        int c = j + 1;
+        int d = n - 1;
+        while(c < d) {
+          long sum = x + y + nums[c] + nums[d];
+          if(sum > target) {
+            d--;
+          } else if(sum < target) {
+              c++;
+          } else {
+              ans.add(List.of((int)x, (int)y, nums[c], nums[d]));
+              for(c++; c < d && nums[c] == nums[c - 1]; c++);
+              for(d--; d > c && nums[d] == nums[d + 1]; d--);
+          }
+        }
+      }
+    }
+    return ans;
+  }
+/*
+22.括号生成
+数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。
+*/
+  List<String> res = new ArrayList<>();
+  public List<String> generateParenthesis(int n) {
+    if(n <= 0) {
+      return res;
+    }
+    getParenthesis("", n, n);
+    return res;
+  }
+  private void getParenthesis(String str, int left, int right) {
+    if(left == 0 && right == 0) {
+      res.add(str);
+      return;
+    }
+    if(left == right) {
+      getParenthesis(str + "(", left - 1, right);
+    } else if(left < right) {
+        if(left > 0) {
+          getParenthesis(str + "(", left - 1, right);
+        }
+        getParenthesis(str + ")", left, right - 1);
+    }
+  }
+}
